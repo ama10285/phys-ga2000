@@ -129,3 +129,12 @@ plt.xlabel('c0', fontsize=16)
 plt.ylabel('c2', fontsize=16)
 plt.legend()
 plt.show()
+
+# Perform PCA with Nc = 20
+approx_spectra_20 = PCA(20, r)
+
+# Calculate squared fractional residuals for Nc = 20
+squared_residuals_20 = np.sum((flux_normalized_0_mean - approx_spectra_20)**2) / np.sum(flux_normalized_0_mean**2)
+
+# Print the fractional error for Nc = 20
+print(f'Fractional error for Nc = 20: {squared_residuals_20:.6f}')
