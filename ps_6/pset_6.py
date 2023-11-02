@@ -9,19 +9,16 @@ plt.plot(logwave, flux[1, :])
 plt.plot(logwave, flux[2, :])
 plt.plot(logwave, flux[3, :])
 plt.plot(logwave, flux[4, :])
+
 plt.ylabel('flux [$10^{−17}$ erg s$^{−1}$ cm$^{−2}$ A$^{-1}$]', fontsize = 16)
 plt.xlabel('wavelength [$A$]', fontsize = 16)
 plt.show()
-plt.savefig("fig1.png")
 # find normalization over wavelength for each galaxy
 flux_sum = np.sum(flux, axis = 1)
 flux_normalized = flux/np.tile(flux_sum, (np.shape(flux)[1], 1)).T
 
 #check that the data is properly "normalized"
 plt.plot(np.sum(flux_normalized, axis = 1))
-plt.ylabel('corresponding galaxy', fontsize = 16)
-plt.xlabel('Sum over each wavelength', fontsize = 16)
-plt.savefig("fig2.png")
 plt.ylim(0,2)
 plt.show()
 
@@ -32,24 +29,8 @@ plt.plot(logwave, flux_normalized_0_mean[0,:]*(10**4))
 plt.ylabel('normalized 0-mean flux', fontsize = 16)
 plt.xlabel('wavelength [$A$]', fontsize = 16)
 plt.show()
-plt.savefig("fig3.png")
 
-# the covariance matrix
-C = np.dot(np. transpose(flux_normalized_0_mean), flux_normalized_0_mean) 
-C. shape
-eigvals, eigvecs = np. linalg.eig(C) 
-sort_idx= np.argsort(eigvals) [::-1]
-cn1= np.max(eigvals)/np.min(eigvals) 
-print(cn1) 
-eigvecs = eigvecs[:, sort_idx] 
-eigvals = eigvals[sort_idx]
-plt.plot(eigvecs [0])
-plt.plot(eigvecs [1])
-plt.plot(eigvecs [2])
-plt.plot(eigvecs [3])
-plt.plot(eigvecs [4])
-plt.show()
-    
+
 
 def sorted_eigs(r, return_eigvalues = False):
     """
@@ -75,6 +56,21 @@ flux_normalized_0_mean = flux_normalized - np.tile(means_normalized, (np.shape(f
 eigvals,eigvecs = sorted_eigs(r, return_eigvalues= True)
 
 
+# the covariance matrix
+C = np.cov(flux_normalized_0_mean.T)
+eigvec = sorted_eigs(flux_normalized_0_mean)
+num_eigenvectors_to_plot = 5
+for i in range(num_eigenvectors_to_plot):
+    plt.plot(logwave, eigvec[:, i], label=f'Eigenvector {i+1}')
+
+plt.xlabel('Wavelength [$\AA$]', fontsize=16)
+plt.ylabel('Amplitude', fontsize=16)
+plt.title('First Five Eigenvectors from PCA', fontsize=18)
+plt.legend()
+plt.show()
+    
+    
+    
 U, S, Vh = np.linalg.svd(r, full_matrices=True)
 print("condition number R =", np.max(S)/np.min(S))
 eigvecs_svd = Vh.T
@@ -113,5 +109,23 @@ plt.plot(logwave, r[1,:], label = 'original data')
 
 plt.ylabel('normalized 0-mean flux', fontsize = 16)
 plt.xlabel('wavelength [$A$]', fontsize = 16)
+plt.legend()
+plt.show()
+
+
+# Assuming you have the eigenvectors stored in eigvec_svd
+# Calculate coefficients c0, c1, c2 for the first 5 spectra
+coefficients = np.dot(flux_normalized_0_mean[:, :5], eigvecs_svd[:, :5].T)
+
+# Plot c0 vs c1 and c0 vs c2
+plt.scatter(coefficients[:, 0], coefficients[:, 1], label='c0 vs c1')
+plt.xlabel('c0', fontsize=16)
+plt.ylabel('c1', fontsize=16)
+plt.legend()
+plt.show()
+
+plt.scatter(coefficients[:, 0], coefficients[:, 2], label='c0 vs c2')
+plt.xlabel('c0', fontsize=16)
+plt.ylabel('c2', fontsize=16)
 plt.legend()
 plt.show()
