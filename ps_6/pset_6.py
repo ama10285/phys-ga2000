@@ -53,7 +53,7 @@ r_subset = r[:500, :]
 means_normalized = np.mean(flux_normalized, axis=1)
 flux_normalized_0_mean = flux_normalized - np.tile(means_normalized, (np.shape(flux)[1], 1)).T
 
-eigvals,eigvecs = sorted_eigs(r, return_eigvalues= True)
+eigvals,eigvecs = sorted_eigs(r_subset, return_eigvalues= True)
 
 
 # the covariance matrix
@@ -71,7 +71,7 @@ plt.show()
     
     
     
-U, S, Vh = np.linalg.svd(r, full_matrices=True)
+U, S, Vh = np.linalg.svd(r_subset, full_matrices=True)
 print("condition number R =", np.max(S)/np.min(S))
 eigvecs_svd = Vh.T
 eigvals_svd = S**2
@@ -85,7 +85,7 @@ plt.plot(np.linspace(-0.2, 0.2), np.linspace(-0.2, 0.2))
 plt.xlabel('SVD eigenvalues', fontsize = 16)
 plt.ylabel('Eig eigenvalues', fontsize = 16)
 plt.show()
-plt.plot(eigvals_svd, eigvals, 'o')
+plt.plot(eigvals_svd, eigvals[:500], 'o')
 plt.xlabel('SVD eigenvalues', fontsize = 16)
 plt.ylabel('Eig eigenvalues', fontsize = 16)
 plt.show()
@@ -104,8 +104,8 @@ def PCA(l, r, project = True):
         return np.dot(eigvec, reduced_wavelength_data).T # multiply eigenvectors by 
                                                         # weights to get approximate spectrum
         
-plt.plot(logwave, PCA(1,r)[1,:], label = 'l = 5')
-plt.plot(logwave, r[1,:], label = 'original data')
+plt.plot(logwave, PCA(1,r_subset)[1,:], label = 'l = 5')
+plt.plot(logwave, r_subset[1,:], label = 'original data')
 
 plt.ylabel('normalized 0-mean flux', fontsize = 16)
 plt.xlabel('wavelength [$A$]', fontsize = 16)
